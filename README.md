@@ -2,7 +2,7 @@
 
 ## Description
 This was a college project that I worked on together with my classmates.
-The development team consisted of 5 students and we were supposed to adopt SCRUM
+The development team was comprised of 5 students and we were supposed to adopt SCRUM
 methodology which consisted of 2 week sprints and daily scrums.
 
 One of the students had to be a team leader, and another the SCRUM master, while
