@@ -1,0 +1,82 @@
+.edit-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #FF7A00;
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+    opacity: 0.75;
+}
+
+.field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+}
+
+.field label {
+    flex: 1;
+    color: #FF7A00; 
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.field input {
+    flex: 3;
+    background-color: #2E2E2E; 
+    color: #FFF; 
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    outline: none;
+}
+
+.field input:focus {
+    outline: 2px solid #FF7A00;
+}
+
+.field button {
+    flex: 0 0 auto;
+    color: #FFF;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.field button:hover {
+    opacity: 0.8;
+}
+
+.birthdate_input{
+    margin-left: 19px;
+}
+
+.field .save-password-btn {
+    color: #FFF;
+    margin: auto;
+    border: 1px solid #FF7A00;
+}
+
+.field .save-password-btn:hover {
+    opacity: 1;
+    color: #FF7A00;
+    background-color: white;
+    border: 1px solid white;
+}

@@ -1,0 +1,1 @@
+kubectl --kubeconfig=.\kubeconfig.yml apply -f .\deployment-prod.yaml

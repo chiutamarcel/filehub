@@ -1,0 +1,133 @@
+.profile-section {
+    flex-grow: 1;
+    background-color: #000000;
+    padding-top: 0;
+    border-radius: 30px;
+    height: 95%;
+    max-height: 95%;
+    overflow-y: auto; 
+    display: flex;
+    flex-direction: column; 
+}
+
+.section {
+    flex-grow: 1; 
+}
+
+.storage-bar {
+    width: 20%;
+}
+
+.profile-section .header {
+    width: 100%;
+    background-color: #ff9900;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    border-radius: 30px;
+}
+
+.circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #E0E0E0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #FF7A00;
+    font-size: 36px;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+}
+
+.circle:hover {
+    opacity: 0.9;
+}
+
+.circle input[type="file"] {
+    display: none;
+}
+
+.user-info {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.user-info h2 {
+    margin: 0;
+    color: #ff9800;
+}
+
+.user-info p {
+    margin: 0;
+    color: #ff9800;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 10px;
+    padding: 20px;
+}
+
+.tabs button {
+    background: none;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.tabs .vertical-line {
+    width: 1px;
+    background-color: #fff;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.tabs .active {
+    border-bottom: 2px solid #ff9800;
+    color: #ccc;
+    opacity: 0.8;
+}
+
+.profile-section .line {
+    margin-bottom: 40px;
+}
+
+.logout-button {
+    background-color: #ff9800;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    margin: 20px auto;
+    align-self: center; 
+    flex-shrink: 0; 
+}
+
+.logout-button:hover {
+    background-color: #fff;
+    color: #ff9800;
+    transition: 0.4s;
+}
+
+.scroll5::-webkit-scrollbar {
+    width: 5px;
+}
+
+.scroll5::-webkit-scrollbar-thumb {
+    background: #F97316;
+    border-radius: 20px;
+}
+
+.scroll5::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 20px;
+}

@@ -1,0 +1,66 @@
+.tab {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+  }
+  
+.tab:hover {
+    color: #ffa500;
+}
+
+.active-tab {
+    border-bottom: 2px solid #ffa500;
+}
+
+.input {
+    background: #333;
+    border: none;
+    padding: 8px;
+    transition: all 0.3s ease;
+}
+
+.invite-btn:hover {
+    background: #ffa500;
+}
+
+.member-item:hover {
+    background-color: #555;
+    transition: background-color 0.3s ease;
+}
+.kick-btn {
+    color: red;
+    cursor: pointer;
+}
+
+.file-item {
+    position: relative;
+}
+
+.tab-content {
+    height: 80%;
+    overflow-y: auto;
+}
+
+.dropdown-menu {
+    z-index: 50;
+    position: absolute;
+    background-color: #2d3748;
+    right: 0;
+    top: 100%;
+}
+
+.scroll2::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scroll2::-webkit-scrollbar-thumb {
+  background: #F97316;
+  border-radius: 20px;
+}
+
+.scroll2::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 20px;
+}
+
+  

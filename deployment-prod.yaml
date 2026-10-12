@@ -1,0 +1,294 @@
+apiVersion: v1
+data:
+  .dockerconfigjson: <PLACEHOLDER>
+kind: Secret
+metadata:
+  name: git-reg-cred
+  namespace: filehub-ns
+type: kubernetes.io/dockerconfigjson
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: filehub-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:latest
+          env:
+            - name: MYSQL_DATABASE
+              value: "mydatabase"
+            - name: MYSQL_PASSWORD
+              value: "secret"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "verysecret"
+            - name: MYSQL_USER
+              value: "myuser"
+          ports:
+            - containerPort: 3306
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: filehub-ns
+spec:
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: mysql
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: filehub-ns
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-pv-claim
+  namespace: filehub-ns
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: filehub-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: registry.example.com/minio
+        args:
+          - server
+          - /data
+          - --console-address
+          - ":9001"
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: "minio"
+        - name: MINIO_SECRET_KEY
+          value: "minio"
+        - name: MINIO_ROOT_USER
+          value: "minioadmin"
+        - name: MINIO_ROOT_PASSWORD
+          value: "minioadmin"
+        - name: MINIO_IDENTITY_OPENID_CONFIG_URL_PRIMARY_IAM
+          value: "http://keycloak:8180/realms/FileHub/.well-known/openid-configuration"
+        - name: MINIO_IDENTITY_OPENID_CLIENT_ID_PRIMARY_IAM
+          value: "filehub-rest-api"
+        - name: MINIO_IDENTITY_OPENID_CLIENT_SECRET_PRIMARY_IAM
+          value: "G9GNOxjksVgd0cQ5PinHKaWeiJYUwcVY"
+        - name: MINIO_IDENTITY_OPENID_DISPLAY_NAME_PRIMARY_IAM
+          value: "keycloak"
+        - name: MINIO_IDENTITY_OPENID_SCOPES_PRIMARY_IAM
+          value: "openid,email,preferred_username"
+      #   volumeMounts:
+      #   - name: storage
+      #     mountPath: "/data"
+      # volumes:
+      # - name: storage
+      #   persistentVolumeClaim:
+      #     claimName: minio-pv-claim
+      imagePullSecrets:
+        - name: git-reg-cred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: filehub-ns
+spec:
+  ports:
+    - port: 9000
+      name: minio-port-api
+      targetPort: 9000
+    - port: 9001 
+      name: minio-port-console
+      targetPort: 9001
+  selector:
+    app: minio
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: filehub-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: registry.example.com/keycloak
+          args: 
+          - start-dev
+          - --import-realm
+          env:
+            - name: KC_DB
+              value: "mysql"
+            - name: KC_DB_URL
+              value: "jdbc:mysql://mysql:3306/mydatabase"
+            - name: KC_DB_USERNAME
+              value: "myuser"
+            - name: KC_DB_PASSWORD
+              value: "secret"
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: "admin"
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: git-reg-cred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  namespace: filehub-ns
+spec:
+  ports:
+    - port: 8180
+      targetPort: 8080
+  selector:
+    app: keycloak
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: react-app
+  namespace: filehub-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: react-app
+  template:
+    metadata:
+      labels:
+        app: react-app
+    spec:
+      containers:
+        - name: react-app
+          image: registry.example.com/react-app
+          ports:
+            - containerPort: 6969
+          env:
+            - name: CHOKIDAR_USEPOLLING
+              value: "true"
+            - name: WATCHPACK_POLLING
+              value: "true"
+      imagePullSecrets:
+        - name: git-reg-cred
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: react-app
+  namespace: filehub-ns
+spec:
+  ports:
+    - port: 6969
+      targetPort: 6969
+  selector:
+    app: react-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filehub-backend
+  namespace: filehub-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: filehub-backend
+  template:
+    metadata:
+      labels:
+        app: filehub-backend
+    spec:
+      imagePullSecrets:
+          - name: git-reg-cred
+      containers:
+        - name: filehub-backend
+          image: registry.example.com/filehub-backend
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: filehub-backend
+  namespace: filehub-ns
+spec:
+  selector:
+    app: filehub-backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: filehub-ns
+spec:
+  tls:
+  - hosts:
+    - filehub.com
+    secretName: tls-secret
+  rules:
+  - host: filehub.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: react-app
+            port:
+              number: 6969
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: filehub-backend
+            port:
+              number: 8080

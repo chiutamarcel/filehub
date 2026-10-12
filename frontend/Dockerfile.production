@@ -1,0 +1,21 @@
+FROM node:21-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+# RUN npm install js-cookie --save
+
+RUN npm install
+
+RUN npm i -g serve
+
+COPY . .
+
+RUN npx tailwindcss init -p
+
+EXPOSE 6969
+
+RUN npm run build
+
+CMD [ "serve", "-s", "dist", "-l", "6969" ]

@@ -1,0 +1,83 @@
+stages:
+  - build
+  - test
+  - package
+  - deploy
+
+variables:
+  IMAGE_TAG: "latest"
+  MAVEN_CLI_OPTS: " -DskipTests --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=./../.m2/repository"
+
+cache:
+  key: maven-dependencies
+  paths:
+    - .m2/repository/
+
+build:
+  stage: build
+  image: maven:3.8.5-openjdk-17
+  script:
+    - cd backend
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+  artifacts:
+    paths:
+      - backend/target/filehub.jar
+    expire_in: 1 hour
+
+test:
+  stage: test
+  image: maven:3.8.5-openjdk-17
+  dependencies:
+    - test
+  script:
+    - echo "Running tests (currently a placeholder)."
+    - cd backend
+    - mvn test
+    - cd ..
+
+build-frontend-image:
+  stage: package
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  script:
+    /kaniko/executor --context "frontend/" --dockerfile "Dockerfile.production" --destination "$CI_REGISTRY_IMAGE/react-app"
+
+build-backend-image:
+  stage: package
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  dependencies:
+    - build
+  script:
+    /kaniko/executor --context "backend/" --dockerfile "Dockerfile" --destination "$CI_REGISTRY_IMAGE/filehub-backend"
+
+build-minio-image:
+  stage: package
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor --context "minio/" --dockerfile "Dockerfile" --destination "$CI_REGISTRY_IMAGE/minio"
+
+build-keycloak-image:
+  stage: package
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.2-debug
+    entrypoint: [""]
+  script:
+    - /kaniko/executor --context "keycloak/" --dockerfile "Dockerfile.production" --destination "$CI_REGISTRY_IMAGE/keycloak"
+
+deploy:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    # Apply Kubernetes YAML to the Rancher cluster
+    - kubectl delete deployment --all --kubeconfig=./kubeconfig.yml -n filehub-ns
+    - kubectl delete service --all --kubeconfig=./kubeconfig.yml -n filehub-ns
+    - kubectl delete ingress --all --kubeconfig=./kubeconfig.yml -n filehub-ns
+    - kubectl --kubeconfig=./kubeconfig.yml apply -f deployment-prod.yaml
+    - echo "Deployment completed."

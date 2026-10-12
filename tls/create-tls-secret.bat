@@ -1,0 +1,1 @@
+kubectl create secret tls tls-secret --namespace filehub-ns --key tls/server.key --cert tls/server.crt --kubeconfig=.\kubeconfig.yml

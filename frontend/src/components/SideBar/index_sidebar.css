@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.scroll4::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scroll4::-webkit-scrollbar-thumb {
+  background: #F97316;
+  border-radius: 20px;
+}
+
+.scroll4::-webkit-scrollbar-track {
+  background: #ddd;
+  border-radius: 20px;
+}
+
+.recents-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Spațiere între icon și text */
+}
+
+.recents-icon {
+  flex-shrink: 0; /* Previne micșorarea iconiței */
+  width: 20px; /* Dimensiune fixă pentru icon */
+  height: 20px;
+}
+
+.recents-text {
+  flex-grow: 1; /* Permite textului să ocupe spațiul disponibil */
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden; /* Ascunde orice depășire */
+  text-overflow: ellipsis; /* Adaugă "..." dacă textul depășește spațiul */
+}
+

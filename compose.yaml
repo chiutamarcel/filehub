@@ -1,0 +1,80 @@
+services:
+  mysql:
+    container_name: 'mysql'
+    image: 'mysql:latest'
+    environment:
+      - 'MYSQL_DATABASE=mydatabase'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=myuser'
+    ports:
+      - '3306:3306'
+
+  minio:
+    container_name: minio
+    build:
+      context: ./minio
+      dockerfile: Dockerfile
+    environment:
+      MINIO_ACCESS_KEY: "minio"
+      MINIO_SECRET_KEY: "minio"
+      MINIO_ROOT_USER: "minioadmin"
+      MINIO_ROOT_PASSWORD: "minioadmin"
+      MINIO_IDENTITY_OPENID_CONFIG_URL_PRIMARY_IAM: "http://keycloak:8180/realms/FileHub/.well-known/openid-configuration"
+      MINIO_IDENTITY_OPENID_CLIENT_ID_PRIMARY_IAM: "filehub-rest-api"
+      MINIO_IDENTITY_OPENID_CLIENT_SECRET_PRIMARY_IAM: "G9GNOxjksVgd0cQ5PinHKaWeiJYUwcVY"
+      MINIO_IDENTITY_OPENID_DISPLAY_NAME_PRIMARY_IAM: "keycloak"
+      MINIO_IDENTITY_OPENID_SCOPES_PRIMARY_IAM: "openid,email,preferred_username"
+      # MINIO_IDENTITY_OPENID_REDIRECT_URI_DYNAMIC_PRIMARY_IAM: "on"
+    ports:
+      - "7000:9000"
+      - "7001:9001"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.0
+    container_name: keycloak
+    environment:
+      - KC_DB=mysql
+      - KC_DB_URL=jdbc:mysql://mysql:3306/mydatabase
+      - KC_DB_USERNAME=myuser
+      - KC_DB_PASSWORD=secret
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HTTP_PORT=8180
+      - KC_LOG_LEVEL=ERROR
+      - QUARKUS_LOG_LEVEL=ERROR
+      # - QUARKUS_LOG_CATEGORY__org_keycloak__LEVEL=WARN
+      # - QUARKUS_LOG_CATEGORY__io_keycloak__LEVEL=WARN
+    ports:
+      - "8180:8180"
+    volumes:
+      - ./keycloak/:/opt/keycloak/data/import/
+    command: 
+      - start-dev
+      - --import-realm
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  react-app:
+    container_name: react-app
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "6969:6969"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./frontend/src:/app/src
+    command: npm run dev -- --host
+    networks:
+      - app-network
+
+# volumes:
+#   minio_data:
+
+networks:
+  app-network:
+    driver: bridge
